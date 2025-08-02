@@ -61,14 +61,22 @@ def predict_sentiment(request: CommentsRequest):
 
         # Final memory read
         current_memory_mb = process.memory_info().rss / 1024 / 1024
-        peak_memory_mb = current_memory_mb
+        
+        peak_memory_mb = current_memory_mb  # fallback
+        if platform.system() in ["Linux", "Darwin"]:
+            try:
+                import resource
+                peak_kb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 
-        if platform.system() == "Linux":
-            import resource
-            peak_memory_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
-        elif platform.system() == "Darwin":
-            import resource
-            peak_memory_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024 / 1024
+                if platform.system() == "Darwin":
+                    peak_memory_mb = peak_kb / 1024 / 1024  # macOS: bytes
+                else:
+                    peak_memory_mb = peak_kb / 1024  # Linux: kilobytes
+            except Exception as e:
+                print("Could not get peak memory with resource module:", e)
+        else:
+            # On Windows, just report current memory usage
+            print("Peak memory measurement not supported on Windows with standard libs.")
 
         elapsed_time = time.perf_counter() - time_start
 
