@@ -53,7 +53,7 @@ def predict_sentiment(request: CommentsRequest):
                     "neutral"
                 )
                 results.append({
-                    "id": comment.comment_id,
+                    "id": comment.id,
                     "body": comment.body,
                     "sentiment": sentiment,
                     "sentiment_score": scores["compound"]
