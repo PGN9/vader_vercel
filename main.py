@@ -14,7 +14,7 @@ app = FastAPI()
 analyzer = SentimentIntensityAnalyzer()
 
 class Comment(BaseModel):
-    comment_id: str
+    id: str
     body: str
 
 class CommentsRequest(BaseModel):
@@ -53,7 +53,7 @@ def predict_sentiment(request: CommentsRequest):
                     "neutral"
                 )
                 results.append({
-                    "comment_id": comment.comment_id,
+                    "id": comment.comment_id,
                     "body": comment.body,
                     "sentiment": sentiment,
                     "sentiment_score": scores["compound"]
